@@ -1,5 +1,3 @@
-/*
-For your reference:
 final class BinaryTreeNode {
     var value: Int
     var left: BinaryTreeNode?
@@ -9,29 +7,42 @@ final class BinaryTreeNode {
         self.value = value
     }
 }
-*/
 
 func lca(root: BinaryTreeNode?, a: BinaryTreeNode?, b: BinaryTreeNode?) -> Int {
     var result = -1
     var done = false
     
-    @discardableResult func findLCA(_ root: BinaryTreeNode?) -> (Bool, Bool) {
-        guard let root = root, let a = a, let b = b else { return (false, false) }
-        
-        var left = findLCA(root.left)
-        var right = findLCA(root.right)
-        
-        let found = (root.value == a.value || left.0 || right.0, root.value == b.value || left.1 || right.1)
-        
-        if found == (true, true) && !done {
-            result = root.value
-            done = true
+    @discardableResult func findLCA(_ root: BinaryTreeNode?) -> Bool {
+        guard let root = root, let a = a, let b = b else { return false }
+
+        if a === root || b === root {
+          result = root.value
+          return true
         }
-        
-        return found
+
+        let left = findLCA(root.left)
+        let right = findLCA(root.right)
+
+        if left && right, !done {
+          result = root.value
+          done = true
+        }
+
+        return left || right
     }
     
     findLCA(root)
     
     return result
+}
+
+func lowestCommonAncestor(_ root: BinaryTreeNode?, _ p: BinaryTreeNode?, _ q: BinaryTreeNode?) -> BinaryTreeNode? {
+    guard let root = root, p !== root, q !== root else { return root }
+
+    let left = lowestCommonAncestor(root.left, p, q)
+    let right = lowestCommonAncestor(root.right, p, q)
+
+    if left != nil, right != nil { return root }
+
+    return left ?? right
 }
